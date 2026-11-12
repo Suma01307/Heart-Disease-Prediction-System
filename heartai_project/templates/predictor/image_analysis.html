@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class="card" style="max-width:640px">
+  <p class="help">{{ hint }}</p>
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    {{ form.non_field_errors }}
+    <label>{{ form.patient.label }}</label>{{ form.patient }}
+    <label>{{ form.image.label }}</label>{{ form.image }}{{ form.image.errors }}
+    <p><button class="btn full">Analyze</button></p>
+  </form>
+  <div class="msg info" style="margin-top:16px;font-size:13px"><b>Tips:</b> use a sharp, well-lit, uncropped image. Results are for education only.</div>
+</div>
+{% endblock %}

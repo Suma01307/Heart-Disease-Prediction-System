@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}New Prediction{% endblock %}
+{% block content %}
+<h1>New Prediction — Clinical Data</h1>
+<div class="card">
+<form method="post">{% csrf_token %}
+  {{ form.non_field_errors }}
+  <label>{{ form.patient.label }}</label>{{ form.patient }}
+  <div class="grid g2" style="gap:0 20px">
+    {% for f in form %}{% if f.name != "patient" %}
+      <div><label>{{ f.label }}</label>{{ f }}{{ f.errors }}</div>
+    {% endif %}{% endfor %}
+  </div>
+  <p><button class="btn">Predict</button></p>
+</form></div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Add Patient{% endblock %}
+{% block content %}
+<h1>Add Patient</h1>
+<div class="card" style="max-width:520px">
+<form method="post">{% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for f in form %}<label>{{ f.label }}</label>{{ f }}{{ f.errors }}{% endfor %}
+  <p><button class="btn">Save</button> <a class="btn outline" href="{% url 'predictor:patients' %}">Cancel</a></p>
+</form></div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Patients{% endblock %}
+{% block content %}
+<h1>Patients <a class="btn small" href="{% url 'predictor:add_patient' %}" style="float:right">+ Add Patient</a></h1>
+<div class="card">
+{% if patients %}
+<table><tr><th>Name</th><th>Age</th><th>Sex</th><th>Predictions</th><th>Added</th></tr>
+{% for p in patients %}<tr><td>{{ p.name }}</td><td>{{ p.age }}</td><td>{{ p.get_sex_display }}</td><td>{{ p.predictions.count }}</td><td>{{ p.created_at|date:"d M Y" }}</td></tr>{% endfor %}
+</table>{% else %}<p class="help">No patients yet.</p>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+<h1>Prediction History</h1>
+<p>
+  <a class="btn small {% if kind %}outline{% endif %}" href="{% url 'predictor:history' %}">All</a>
+  {% for k, label in kinds %}<a class="btn small {% if kind != k %}outline{% endif %}" href="?kind={{ k }}">{{ label }}</a> {% endfor %}
+</p>
+<div class="card">
+{% if predictions %}
+<table>
+  <tr><th>Date</th><th>Type</th><th>Patient</th><th>Result</th><th>Confidence</th><th></th></tr>
+  {% for p in predictions %}
+  <tr>
+    <td>{{ p.created_at|date:"d M Y H:i" }}</td><td>{{ p.get_kind_display }}</td><td>{{ p.patient|default:"—" }}</td>
+    <td><span class="pill {% if p.is_positive %}bad{% else %}good{% endif %}">{{ p.result }}</span></td>
+    <td>{{ p.confidence|floatformat:1 }}%</td>
+    <td><a href="{% url 'predictor:result' p.pk %}">View</a>
+      <form method="post" action="{% url 'predictor:delete_prediction' p.pk %}" style="display:inline" onsubmit="return confirm('Delete this prediction?')">{% csrf_token %}
+        <button class="btn small outline" style="margin-left:8px">Delete</button></form></td>
+  </tr>{% endfor %}
+</table>
+{% else %}<p class="help">Nothing here yet.</p>{% endif %}
+</div>
+{% endblock %}

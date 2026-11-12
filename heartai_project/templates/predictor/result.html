@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Result{% endblock %}
+{% block content %}
+<div class="card" style="max-width:720px">
+  <div class="result-box">
+    <div style="font-size:46px">{% if pred.is_positive %}⚠️{% else %}✅{% endif %}</div>
+    <p class="help">{{ pred.get_kind_display }} · {{ pred.created_at|date:"d M Y H:i" }}</p>
+    <h1 style="color:{% if pred.is_positive %}#e63946{% else %}#10b981{% endif %}">{{ pred.result }}</h1>
+    <p>Model confidence: <b>{{ pred.confidence|floatformat:1 }}%</b></p>
+    <div class="gauge"><div style="width:{{ pred.confidence|floatformat:0 }}%;background:{% if pred.is_positive %}#e63946{% else %}#10b981{% endif %}"></div></div>
+    {% if pred.patient %}<p>Patient: <b>{{ pred.patient.name }}</b></p>{% endif %}
+  </div>
+  {% if pred.image %}<p style="text-align:center"><img src="{{ pred.image.url }}" alt="Uploaded" style="max-width:100%;max-height:320px;border-radius:8px"></p>{% endif %}
+  {% if pred.input_data %}
+  <h3>Input values</h3>
+  <table>{% for k, v in pred.input_data.items %}<tr><th>{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}</table>
+  {% endif %}
+  <div class="msg error" style="margin-top:16px;font-size:13px">This is an educational prediction, not a diagnosis. Please consult a qualified doctor.</div>
+  <p><a class="btn outline" href="{% url 'predictor:history' %}">History</a>
+     <a class="btn" href="{% url 'predictor:dashboard' %}">Dashboard</a></p>
+</div>
+{% endblock %}

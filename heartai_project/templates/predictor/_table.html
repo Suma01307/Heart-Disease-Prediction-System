@@ -1,0 +1,15 @@
+{% if predictions %}
+<table>
+  <tr><th>Date</th><th>Type</th><th>Patient</th><th>Result</th><th>Confidence</th><th></th></tr>
+  {% for p in predictions %}
+  <tr>
+    <td>{{ p.created_at|date:"d M Y H:i" }}</td>
+    <td>{{ p.get_kind_display }}</td>
+    <td>{{ p.patient|default:"—" }}</td>
+    <td><span class="pill {% if p.is_positive %}bad{% else %}good{% endif %}">{{ p.result }}</span></td>
+    <td>{{ p.confidence|floatformat:1 }}%</td>
+    <td><a href="{% url 'predictor:result' p.pk %}">View</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}<p class="help">No predictions yet.</p>{% endif %}

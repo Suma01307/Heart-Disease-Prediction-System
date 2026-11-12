@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create Account{% endblock %}
+{% block public %}
+<div class="authbox" style="max-width:520px">
+  <div class="heart">❤</div><h2>Create Account</h2><p class="sub">Join HeartAI for intelligent heart disease prediction</p>
+  <form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row2">
+      <div><label>First Name</label>{{ form.first_name }}{{ form.first_name.errors }}</div>
+      <div><label>Last Name</label>{{ form.last_name }}{{ form.last_name.errors }}</div>
+    </div>
+    <label>Username</label>{{ form.username }}{{ form.username.errors }}
+    <label>Email Address</label>{{ form.email }}{{ form.email.errors }}
+    <div class="row2">
+      <div><label>Role</label>{{ form.role }}{{ form.role.errors }}</div>
+      <div><label>{{ form.institution.label }}</label>{{ form.institution }}</div>
+    </div>
+    <label>Password</label>{{ form.password1 }}{{ form.password1.errors }}
+    <label>Confirm Password</label>{{ form.password2 }}{{ form.password2.errors }}
+    <p><button class="btn full">Create Account</button></p>
+  </form>
+  <p style="text-align:center;font-size:13px">Already have an account? <a href="{% url 'accounts:login' %}"><b>Sign In</b></a></p>
+</div>
+{% endblock %}

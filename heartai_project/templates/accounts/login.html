@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block public %}
+<div class="authbox">
+  <div class="heart">❤</div><h2>Welcome Back</h2><p class="sub">Sign in to HeartAI</p>
+  <form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    <label>Username</label>{{ form.username }}{{ form.username.errors }}
+    <label>Password</label>{{ form.password }}{{ form.password.errors }}
+    <p><button class="btn full">Sign In</button></p>
+  </form>
+  <hr style="border:0;border-top:1px solid #e5e7eb">
+  <p style="text-align:center;font-size:13px">Don't have an account? <a href="{% url 'accounts:register' %}"><b>Create Account</b></a></p>
+  <p style="text-align:center;font-size:12px"><a href="{% url 'predictor:landing' %}">← Back to Home</a></p>
+</div>
+{% endblock %}

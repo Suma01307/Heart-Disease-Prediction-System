@@ -1,0 +1,106 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}HeartAI{% endblock %} · Heart Disease Prediction</title>
+<style>
+:root{--navy:#1e3a5f;--red:#e63946;--bg:#f6f8fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--green:#10b981;--amber:#f59e0b;--border:#e5e7eb}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--navy);text-decoration:none}
+.topbar{background:linear-gradient(90deg,#1e3a5f,#2a5a85);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
+.topbar a{color:#fff;margin-left:18px;font-size:14px}
+.brand{font-weight:700;font-size:18px;margin:0!important}
+.layout{display:flex;min-height:calc(100vh - 52px)}
+.sidebar{width:210px;background:#fff;border-right:1px solid var(--border);padding:16px 12px;flex-shrink:0}
+.sidebar a{display:block;padding:10px 12px;border-radius:8px;font-size:14px;color:var(--text);margin-bottom:4px}
+.sidebar a.active,.sidebar a:hover{background:var(--red);color:#fff}
+.sidebar hr{border:0;border-top:1px solid var(--border);margin:12px 0}
+.badge{display:inline-block;background:#22d3ee;color:#fff;font-size:11px;padding:3px 10px;border-radius:99px;margin-bottom:14px}
+main{flex:1;padding:28px;max-width:1200px}
+.public main{max-width:none;padding:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:20px}
+.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.stat{color:#fff;border-radius:12px;padding:18px}.stat h2{margin:0;font-size:32px}.stat p{margin:4px 0 0;font-size:13px;opacity:.9}
+.s1{background:linear-gradient(135deg,#1e3a5f,#2f6690)}.s2{background:linear-gradient(135deg,#10b981,#34d399)}.s3{background:linear-gradient(135deg,#f59e0b,#fbbf24)}.s4{background:linear-gradient(135deg,#e63946,#ff6b6b)}
+.btn{display:inline-block;background:linear-gradient(90deg,#e63946,#ff6b6b);color:#fff;border:0;border-radius:8px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer}
+.btn.outline{background:#fff;color:var(--red);border:1px solid var(--red)}
+.btn.small{padding:6px 12px;font-size:12px}
+.btn.full{width:100%}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 5px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:#f9fafb;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid #93c5fd;background:#fff}
+.errorlist{color:var(--red);list-style:none;padding:0;margin:4px 0;font-size:12px}
+.help{font-size:12px;color:var(--muted)}
+.msg{padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px}
+.msg.success{background:#d1fae5;color:#065f46}.msg.error{background:#fee2e2;color:#991b1b}.msg.info{background:#dbeafe;color:#1e40af}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase}
+.pill{padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.bad{background:#fee2e2;color:#991b1b}.pill.good{background:#d1fae5;color:#065f46}
+.authbox{max-width:440px;margin:40px auto;background:#fff;border-radius:14px;padding:32px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.authbox h2{text-align:center;margin:8px 0 2px}.authbox .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:12px}
+.heart{text-align:center;font-size:42px;color:var(--red)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hero{background:linear-gradient(135deg,#fff 0%,#fdecee 100%);padding:70px 8%;display:flex;gap:40px;align-items:center;flex-wrap:wrap}
+.hero h1{font-size:44px;margin:0 0 12px}.hero h1 span{color:var(--red)}
+.features{padding:50px 8%}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+.gauge{height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden}.gauge>div{height:100%}
+.result-box{text-align:center;padding:30px}.result-box h1{font-size:40px;margin:8px 0}
+canvas{max-height:280px}
+</style>
+</head>
+<body class="{% if not user.is_authenticated %}public{% endif %}">
+<div class="topbar">
+  <a class="brand" href="{% url 'predictor:landing' %}">❤ HeartAI</a>
+  <nav>
+    {% if user.is_authenticated %}
+      <a href="{% url 'predictor:dashboard' %}">Dashboard</a>
+      <a href="{% url 'predictor:new_prediction' %}">Predictions</a>
+      <span style="margin-left:18px;font-size:14px">👤 {{ user.username }}</span>
+      <form action="{% url 'accounts:logout' %}" method="post" style="display:inline">{% csrf_token %}
+        <button class="btn small" style="margin-left:14px">Logout</button></form>
+    {% else %}
+      <a href="{% url 'accounts:login' %}">Login</a>
+      <a href="{% url 'accounts:register' %}">Register</a>
+    {% endif %}
+  </nav>
+</div>
+
+{% if user.is_authenticated %}
+<div class="layout">
+  <aside class="sidebar">
+    <span class="badge">{{ user.profile.get_role_display|default:"User" }}</span>
+    {% url 'predictor:dashboard' as u_dash %}{% url 'predictor:new_prediction' as u_new %}
+    {% url 'predictor:analyze_image' 'xray' as u_xray %}{% url 'predictor:analyze_image' 'ecg' as u_ecg %}
+    {% url 'predictor:history' as u_hist %}{% url 'predictor:patients' as u_pat %}{% url 'predictor:statistics' as u_stat %}
+    <a href="{{ u_dash }}" class="{% if request.path == u_dash %}active{% endif %}">Dashboard</a>
+    <a href="{{ u_new }}" class="{% if request.path == u_new %}active{% endif %}">New Prediction</a>
+    <a href="{{ u_xray }}" class="{% if request.path == u_xray %}active{% endif %}">X-Ray Analysis</a>
+    <a href="{{ u_ecg }}" class="{% if request.path == u_ecg %}active{% endif %}">ECG Analysis</a>
+    <hr>
+    <a href="{{ u_hist }}" class="{% if request.path == u_hist %}active{% endif %}">History</a>
+    <a href="{{ u_pat }}" class="{% if request.path == u_pat %}active{% endif %}">Patients</a>
+    <a href="{{ u_stat }}" class="{% if request.path == u_stat %}active{% endif %}">Statistics</a>
+    <hr>
+    <a href="{% url 'predictor:about' %}">About</a>
+    <a href="{% url 'predictor:disclaimer' %}">Disclaimer</a>
+  </aside>
+  <main>
+    {% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}
+<main>
+  {% for m in messages %}<div class="msg {{ m.tags }}" style="margin:16px 8%">{{ m }}</div>{% endfor %}
+  {% block public %}{% endblock %}
+</main>
+{% endif %}
+<div class="footer">HeartAI — Educational project. Not a medical device.</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

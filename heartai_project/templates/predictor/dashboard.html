@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="grid g4" style="margin-bottom:20px">
+  <div class="stat s1"><h2>{{ total }}</h2><p>Total Predictions</p></div>
+  <div class="stat s2"><h2>{{ patients }}</h2><p>Patients</p></div>
+  <div class="stat s3"><h2>{{ this_week }}</h2><p>This Week</p></div>
+  <div class="stat s4"><h2>{{ avg_conf }}%</h2><p>Avg Confidence</p></div>
+</div>
+<div class="grid g2">
+  <div class="card"><h3>⚡ Quick Actions</h3>
+    <p><a class="btn outline full" href="{% url 'predictor:analyze_image' 'xray' %}">Analyze Chest X-Ray</a></p>
+    <p><a class="btn outline full" href="{% url 'predictor:analyze_image' 'ecg' %}">Analyze ECG Signal</a></p>
+    <p><a class="btn outline full" href="{% url 'predictor:new_prediction' %}">Clinical Data Prediction</a></p>
+    <p><a class="btn outline full" href="{% url 'predictor:add_patient' %}">Add New Patient</a></p>
+  </div>
+  <div class="card"><h3>Predictions by Result</h3><canvas id="c1"></canvas></div>
+  <div class="card"><h3>Predictions by Type</h3><canvas id="c2"></canvas></div>
+</div>
+<div class="card"><h3>Recent Predictions</h3>
+  {% include "predictor/_table.html" with predictions=recent %}
+</div>
+{{ by_result|json_script:"d-result" }}
+{{ by_type|json_script:"d-type" }}
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+function draw(id, dataId, type, colors){
+  const d = JSON.parse(document.getElementById(dataId).textContent);
+  const labels = Object.keys(d);
+  if(!labels.length){ document.getElementById(id).replaceWith(Object.assign(document.createElement('p'),{className:'help',textContent:'No data yet — make a prediction.'})); return; }
+  new Chart(document.getElementById(id),{type:type,data:{labels:labels,datasets:[{data:Object.values(d),backgroundColor:colors}]},options:{plugins:{legend:{position:'bottom'}}}});
+}
+draw('c1','d-result','doughnut',['#e63946','#10b981','#f59e0b','#1e3a5f']);
+draw('c2','d-type','bar',['#1e3a5f','#e63946','#10b981']);
+</script>
+{% endblock %}
